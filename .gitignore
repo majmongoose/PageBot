@@ -1,0 +1,5 @@
+# Ignore ffmpeg executable
+ffmpeg
+
+# Ignore secrets file
+secrets_file.py
