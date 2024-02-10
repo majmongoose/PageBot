@@ -11,14 +11,12 @@ from watchdog.events import FileSystemEventHandler
 
 class MyHandler(FileSystemEventHandler):
     def on_created(self, event):
-        print("New Created!")
         if event.is_directory:
-            print("Was a directory")
             return
         filepath = event.src_path
         filename, file_extension = os.path.splitext(filepath)
         if file_extension.lower() == '.mp3':
-            print("Was an MP3!")
+            print("New MP3!")
             mp4_file = convert_to_mp4(filepath)
             client.loop.create_task(upload_to_discord(mp4_file))
 
