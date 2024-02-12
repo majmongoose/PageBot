@@ -3,7 +3,7 @@ __pycache__/
 # Ignore ffmpeg executable
 ffmpeg
 ffmpeg.exe
-output_audio.wav
+*.wav
 
 # Ignore secrets file
 secrets_file.py

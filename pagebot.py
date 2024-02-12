@@ -25,7 +25,7 @@ class MyHandler(FileSystemEventHandler):
             text = ""
             if secrets_file.speech_to_text:
                 print("Converting To Text")
-                text = convert_to_text(filepath)
+                text = convert_to_text(filepath,filename)
             print("Converting to MP4")
             mp4_file = convert_to_mp4(filepath)
             print("Sending to Discord")
@@ -46,18 +46,18 @@ def convert_to_mp4(mp3_file):
         print(f"Error during conversion: {e}")
         return None
   
-def convert_to_text(mp3_file):
-    print(mp3_file)
+def convert_to_text(mp3_path,mp3_name):
+    print(mp3_path)
     try:
-        command = f'ffmpeg -i "{mp3_file}" output_audio.wav'
+        command = f'ffmpeg -i "{mp3_path}" {mp3_name}.wav'
         subprocess.run(command, shell=True)
         r = sr.Recognizer() 
         # Load the audio file 
-        with sr.AudioFile("output_audio.wav") as source: 
+        with sr.AudioFile(f"{mp3_name}.wav") as source: 
             data = r.record(source) 
         # Convert speech to text 
         text = r.recognize_google(data) 
-        os.remove("output_audio.wav")
+        os.remove("{mp3_name}.wav")
         return (text)
     except Exception as e:
         print(f"Error during conversion: {e}")
