@@ -24,17 +24,22 @@ class MyHandler(FileSystemEventHandler):
             print("New MP3!")
             text = ""
             if secrets_file.speech_to_text:
+                print("Converting To Text")
                 text = convert_to_text(filepath)
+            print("Converting to MP4")
             mp4_file = convert_to_mp4(filepath)
+            print("Sending to Discord")
             client.loop.create_task(upload_to_discord(mp4_file,text))
-        os.remove(filepath)
+        #time.sleep(10)
+        print("Removing original file.")
+        #os.remove(filepath)
 
 ##convert mp3 to mp4
 def convert_to_mp4(mp3_file):
     try:
         time.sleep(10)
         mp4_file = os.path.splitext(mp3_file)[0] + '.mp4'
-        command = f'./ffmpeg -loop 1 -i img/blacksmall.jpg -i "{mp3_file}" -c:a aac -b:a 192k -c:v libx264 -pix_fmt yuv420p -shortest "{mp4_file}"'
+        command = f'ffmpeg -loop 1 -i img/blacksmall.jpg -i "{mp3_file}" -c:a aac -b:a 192k -c:v libx264 -pix_fmt yuv420p -shortest "{mp4_file}"'
         subprocess.run(command, shell=True)
         return mp4_file
     except Exception as e:
@@ -42,16 +47,22 @@ def convert_to_mp4(mp3_file):
         return None
   
 def convert_to_text(mp3_file):
-    command = f'./ffmpeg -i "{mp3_file}" output_audio.wav'
-    subprocess.run(command, shell=True)
-    r = sr.Recognizer() 
-    # Load the audio file 
-    with sr.AudioFile("output_audio.wav") as source: 
-        data = r.record(source) 
-    # Convert speech to text 
-    text = r.recognize_google(data) 
-    os.remove("output_audio.wav")
-    return (text)
+    print(mp3_file)
+    try:
+        command = f'ffmpeg -i "{mp3_file}" output_audio.wav'
+        subprocess.run(command, shell=True)
+        r = sr.Recognizer() 
+        # Load the audio file 
+        with sr.AudioFile("output_audio.wav") as source: 
+            data = r.record(source) 
+        # Convert speech to text 
+        text = r.recognize_google(data) 
+        os.remove("output_audio.wav")
+        return (text)
+    except Exception as e:
+        print(f"Error during conversion: {e}")
+        return ""
+
 
 
 ## upload to discord

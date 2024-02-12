@@ -1,6 +1,9 @@
+# Ignore pycache
+__pycache__/
 # Ignore ffmpeg executable
 ffmpeg
-ffprobe
+ffmpeg.exe
+output_audio.wav
 
 # Ignore secrets file
 secrets_file.py
