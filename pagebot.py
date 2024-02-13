@@ -49,7 +49,7 @@ def convert_to_mp4(mp3_file):
 def convert_to_text(mp3_path,mp3_name):
     print(mp3_path)
     try:
-        command = f'ffmpeg -i "{mp3_path}" {mp3_name}.wav'
+        command = f'ffmpeg -i "{mp3_path}" "{mp3_name}".wav'
         subprocess.run(command, shell=True)
         r = sr.Recognizer() 
         # Load the audio file 
@@ -57,7 +57,7 @@ def convert_to_text(mp3_path,mp3_name):
             data = r.record(source) 
         # Convert speech to text 
         text = r.recognize_google(data) 
-        os.remove("{mp3_name}.wav")
+        os.remove(f"{mp3_name}.wav")
         return (text)
     except Exception as e:
         print(f"Error during conversion: {e}")
