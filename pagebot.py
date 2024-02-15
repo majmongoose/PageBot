@@ -117,8 +117,9 @@ if __name__ == "__main__":
     observer.start()
 
     ## Launch TTD
-    watchdog_thread = threading.Thread(target=launch_and_watch, args=(secrets_file.ttd_path,))
-    watchdog_thread.start()
+    if (secrets_file.ttd_path != ""):
+        watchdog_thread = threading.Thread(target=launch_and_watch, args=(secrets_file.ttd_path,))
+        watchdog_thread.start()
 
     ## initialize discord 
     intents = discord.Intents.default()
