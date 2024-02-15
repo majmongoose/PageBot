@@ -9,8 +9,7 @@ from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 import speech_recognition as sr 
 
-## file handler
-
+## New File Handler
 class MyHandler(FileSystemEventHandler):
     def on_created(self, event):
         if event.is_directory:
@@ -31,22 +30,21 @@ class MyHandler(FileSystemEventHandler):
             mp4_file = convert_to_mp4(filepath)
             print("Sending to Discord")
             client.loop.create_task(upload_to_discord(mp4_file,text))
-        #time.sleep(10)
-        print("Removing original file.")
-        #os.remove(filepath)
 
-##convert mp3 to mp4
+## Convert MP3 to MP4
 def convert_to_mp4(mp3_file):
     try:
         time.sleep(10)
         mp4_file = os.path.splitext(mp3_file)[0] + '.mp4'
         command = f'ffmpeg -loop 1 -i img/blacksmall.jpg -i "{mp3_file}" -c:a aac -b:a 192k -c:v libx264 -pix_fmt yuv420p -shortest "{mp4_file}"'
         subprocess.run(command, shell=True)
+        os.remove(mp3_file)
         return mp4_file
     except Exception as e:
         print(f"Error during conversion: {e}")
         return None
-  
+
+## Send audio to interpreter
 def convert_to_text(mp3_path,mp3_name):
     print(mp3_path)
     try:
@@ -106,7 +104,7 @@ def launch_and_watch(program_path):
             break
 
         # Wait for a few seconds before relaunching
-        time.sleep(5)
+        time.sleep(2)
 
 if __name__ == "__main__":
 
