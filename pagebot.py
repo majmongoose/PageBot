@@ -93,6 +93,19 @@ async def upload_to_discord(mp4_file,text):
     else:
         print(f"Could not find channel with ID {channel}")
 
+def launch_and_watch(program_path):
+    while True:
+        process = subprocess.Popen(program_path)
+        process.wait()
+        if process.returncode != 0:
+            print("TTD has crashed. Relaunching...")
+        else:
+            print("TTD has exited normally.")
+            break
+
+        # Wait for a few seconds before relaunching
+        time.sleep(5)
+
 if __name__ == "__main__":
 
     ## initialize watchdogs
@@ -101,11 +114,15 @@ if __name__ == "__main__":
     observer.schedule(event_handler, secrets_file.watch_folder, recursive=False)
     observer.start()
 
+    ## Launch TTD
+    launch_and_watch(secrets_file.ttd_path)
+
     ## initialize discord 
     intents = discord.Intents.default()
     intents.message_content = True
     client = discord.Client(intents=intents)
     client.run(secrets_file.key)
+    
 
     try:
         while True:
