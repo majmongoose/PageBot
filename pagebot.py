@@ -4,6 +4,7 @@ import os
 import subprocess
 import time
 import secrets_file
+import threading
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 import speech_recognition as sr 
@@ -116,7 +117,8 @@ if __name__ == "__main__":
     observer.start()
 
     ## Launch TTD
-    launch_and_watch(secrets_file.ttd_path)
+    watchdog_thread = threading.Thread(target=launch_and_watch, args=(secrets_file.ttd_path,))
+    watchdog_thread.start()
 
     ## initialize discord 
     intents = discord.Intents.default()
