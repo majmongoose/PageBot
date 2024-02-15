@@ -94,8 +94,9 @@ async def upload_to_discord(mp4_file,text):
         print(f"Could not find channel with ID {channel}")
 
 def launch_and_watch(program_path):
+    program_directory = os.path.dirname(program_path)
     while True:
-        process = subprocess.Popen(program_path)
+        process = subprocess.Popen(program_path,cwd=program_directory)
         process.wait()
         if process.returncode != 0:
             print("TTD has crashed. Relaunching...")
