@@ -86,7 +86,7 @@ async def upload_to_discord(mp4_file,text):
         role_name = filename.split('-', 1)[0].strip()
         role = discord.utils.get(channel.guild.roles, name=role_name)
         if role:
-            await channel.send(f"{role.mention} Go get em brothers!")
+            await channel.send(f"{role.mention} {secrets_file.notify_text}")
         else:
             print(f"Role '{role_name}' not found.")
     else:

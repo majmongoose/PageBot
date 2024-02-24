@@ -4,6 +4,8 @@ ttd_path = "C:\\PATH\\TO\\TTD.exe"
 key = 'Bot Token'
 ## Folder to Watch for output audio
 watch_folder = '/path/to/folder'
+## Text for after a ping.
+notify_text = "You've been paged!"
 ## Discord Channel ID to send notifications
 channel_id = channel_id_number
 ## Generally a good idea.
