@@ -12,10 +12,10 @@ PageBot is a discord bot written in python using the discord.py library, which w
 6. Run the bot with ```python pagebot.py```
 
 # Configuration
-|   | ttd_path  | key  | watch_folder  | channel_id  | delete_after_upload  | speech_to_text
-|---|---|---|---|---|---|---|
-| Required  | NO  |  YES |  YES |  YES |  YES |  YES |
-|  Description |  Path to launch TTD from, leave "" to disable. |  Discord bot token. |  Folder to watch for new audio clips. |  Discord Channel ID to send page notifications. | Delete *.mp4 file after uploading to Discord.  |  Enable/Disable Speech to Text. It does not work well, and is very slow. |
+|             | ttd_path                                      | key                | watch_folder                         | notify_text                                          | channel_id                                     | delete_after_upload                           | speech_to_text                                                          |
+|-------------|-----------------------------------------------|--------------------|--------------------------------------|------------------------------------------------------|------------------------------------------------|-----------------------------------------------|-------------------------------------------------------------------------|
+| Required    | NO                                            | YES                | YES                                  | NO                                                   | YES                                            | YES                                           | YES                                                                     |
+| Description | Path to launch TTD from, leave "" to disable. | Discord bot token. | Folder to watch for new audio clips. | Can be blank, send a message when notfied of a page. | Discord Channel ID to send page notifications. | Delete *.mp4 file after uploading to Discord. | Enable/Disable Speech to Text. It does not work well, and is very slow. |
 
 
 
