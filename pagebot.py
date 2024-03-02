@@ -36,7 +36,7 @@ def convert_to_mp4(mp3_file):
     try:
         time.sleep(10)
         mp4_file = os.path.splitext(mp3_file)[0] + '.mp4'
-        command = f'ffmpeg -loop 1 -i img/blacksmall.jpg -i "{mp3_file}" -c:a aac -b:a 192k -c:v libx264 -pix_fmt yuv420p -shortest "{mp4_file}"'
+        command = f'ffmpeg -loop 1 -i "{secrets_file.image_path}" -i "{mp3_file}" -c:a aac -b:a 192k -c:v libx264 -pix_fmt yuv420p -shortest "{mp4_file}"'
         subprocess.run(command, shell=True)
         os.remove(mp3_file)
         return mp4_file

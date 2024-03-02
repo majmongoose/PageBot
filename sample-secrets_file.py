@@ -12,3 +12,5 @@ channel_id = channel_id_number
 delete_after_upload=True
 ## This will slow down pages and is unreliable.
 speech_to_text = True
+## The background image for the video.
+image_path = "img/blacksmall.jpg"
