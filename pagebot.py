@@ -1,5 +1,5 @@
+#!/usr/bin/python3
 import discord
-from discord.ext import commands
 import os
 import subprocess
 import time
@@ -8,9 +8,6 @@ import threading
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 import speech_recognition as sr 
-
-## Initialize the bot with command prefix
-bot = commands.Bot(command_prefix='!')
 
 ## New File Handler
 class MyHandler(FileSystemEventHandler):
@@ -32,7 +29,7 @@ class MyHandler(FileSystemEventHandler):
             print("Converting to MP4")
             mp4_file = convert_to_mp4(filepath)
             print("Sending to Discord")
-            bot.loop.create_task(upload_to_discord(mp4_file,text))
+            client.loop.create_task(upload_to_discord(mp4_file,text))
 
 ## Convert MP3 to MP4
 def convert_to_mp4(mp3_file):
@@ -65,6 +62,8 @@ def convert_to_text(mp3_path,mp3_name):
         print(f"Error during conversion: {e}")
         return ""
 
+
+
 ## upload to discord
 async def upload_to_discord(mp4_file,text):
     ## Check to make sure conversion worked.
@@ -72,7 +71,7 @@ async def upload_to_discord(mp4_file,text):
         print("Conversion failed. Skipping upload.")
         return
     ## Get channel to send in
-    channel = bot.get_channel(secrets_file.channel_id)
+    channel = client.get_channel(secrets_file.channel_id)
     if channel:
         filename = os.path.basename(mp4_file)
         ## Send Video with name
@@ -93,52 +92,39 @@ async def upload_to_discord(mp4_file,text):
     else:
         print(f"Could not find channel with ID {channel}")
 
-## Command to restart TTD software manually
-@bot.command()
-async def restart_ttd(ctx):
-    if secrets_file.ttd_path:
-        await ctx.send("Restarting TTD software...")
-        restart_ttd_process(secrets_file.ttd_path)
-    else:
-        await ctx.send("TTD path not configured.")
-
-## Function to restart TTD software
-def restart_ttd_process(program_path):
+def launch_and_watch(program_path):
     program_directory = os.path.dirname(program_path)
-    process = subprocess.Popen(program_path, cwd=program_directory)
-    process.wait()
-    if process.returncode != 0:
-        print("TTD has crashed. Relaunching...")
-    else:
-        print("TTD has exited normally.")
-
-## Launch and watch TTD
-def launch_and_watch_ttd():
     while True:
-        process = subprocess.Popen(secrets_file.ttd_path)
+        process = subprocess.Popen(program_path,cwd=program_directory)
         process.wait()
         if process.returncode != 0:
             print("TTD has crashed. Relaunching...")
         else:
             print("TTD has exited normally.")
             break
+
         # Wait for a few seconds before relaunching
         time.sleep(2)
 
 if __name__ == "__main__":
-    ## Initialize watchdogs
+
+    ## initialize watchdogs
     event_handler = MyHandler()
     observer = Observer()
     observer.schedule(event_handler, secrets_file.watch_folder, recursive=False)
     observer.start()
 
-    ## Start watching TTD
-    if secrets_file.ttd_path:
-        ttd_thread = threading.Thread(target=launch_and_watch_ttd)
-        ttd_thread.start()
+    ## Launch TTD
+    if (secrets_file.ttd_path != ""):
+        watchdog_thread = threading.Thread(target=launch_and_watch, args=(secrets_file.ttd_path,))
+        watchdog_thread.start()
 
-    ## Initialize Discord bot
-    bot.run(secrets_file.key)
+    ## initialize discord 
+    intents = discord.Intents.default()
+    intents.message_content = True
+    client = discord.Client(intents=intents)
+    client.run(secrets_file.key)
+    
 
     try:
         while True:
@@ -147,7 +133,9 @@ if __name__ == "__main__":
         observer.stop()
     observer.join()
 
-## Discord event
-@bot.event
+##discord stuffs
+@client.event
 async def on_ready():
-    print(f'We have logged in as {bot.user}')
+    print(f'We have logged in as {client.user}')
+
+
