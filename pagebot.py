@@ -5,7 +5,6 @@ import subprocess
 import time
 import secrets_file
 import threading
-import psutil
 from datetime import datetime
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
@@ -95,17 +94,6 @@ async def upload_to_discord(mp4_file,text):
         print(f"Could not find channel with ID {channel}")
 
 
-def kill_existing_ttd_instances():
-    """Terminate all running instances of TTD."""
-    for proc in psutil.process_iter(['name', 'exe', 'cmdline']):
-        try:
-            if 'ttd' in proc.name().lower() or 'ttd' in ' '.join(proc.cmdline()).lower():
-                print("Terminating an existing instance of TTD...")
-                proc.terminate()  # Send SIGTERM
-                proc.wait()  # Wait for the process to terminate
-        except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
-            pass
-
 def launch_and_watch(program_path):
     program_directory = os.path.dirname(program_path)
     restart_time = secrets_file.restart_time  # Format: "HH:MM" or None
@@ -114,10 +102,14 @@ def launch_and_watch(program_path):
         restart_hour, restart_minute = map(int, restart_time.split(":"))
     
     restart_triggered = False  # Flag to prevent multiple restarts within the same minute
+    process = None  # Initialize the process variable outside the loop
 
     while True:
-        # Terminate any existing TTD processes before starting a new one
-        kill_existing_ttd_instances()
+        # If a process is already running, terminate it before starting a new one
+        if process and process.poll() is None:
+            print("Terminating the existing TTD process before restarting...")
+            process.terminate()
+            process.wait()
 
         # Launch the TTD program
         print("Starting TTD program...")
@@ -150,6 +142,7 @@ def launch_and_watch(program_path):
         # Wait for a few seconds before relaunching after crash or scheduled restart
         print("Waiting before relaunching TTD...")
         time.sleep(2)
+
 
 if __name__ == "__main__":
 
