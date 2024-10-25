@@ -5,6 +5,7 @@ import subprocess
 import time
 import secrets_file
 import threading
+from datetime import datetime
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 import speech_recognition as sr 
@@ -92,19 +93,41 @@ async def upload_to_discord(mp4_file,text):
     else:
         print(f"Could not find channel with ID {channel}")
 
+from datetime import datetime
+
 def launch_and_watch(program_path):
     program_directory = os.path.dirname(program_path)
-    while True:
-        process = subprocess.Popen(program_path,cwd=program_directory)
-        process.wait()
-        if process.returncode != 0:
-            print("TTD has crashed. Relaunching...")
-        else:
-            print("TTD has exited normally.")
-            break
+    restart_time = secrets_file.restart_time  # Format: "HH:MM" or None
 
-        # Wait for a few seconds before relaunching
+    # Parse the restart time only if it's specified
+    if restart_time:
+        restart_hour, restart_minute = map(int, restart_time.split(":"))
+
+    while True:
+        # Launch the TTD program
+        process = subprocess.Popen(program_path, cwd=program_directory)
+
+        while True:
+            # Check every minute if it's time to restart TTD (only if restart_time is set)
+            if restart_time:
+                current_time = datetime.now()
+                if current_time.hour == restart_hour and current_time.minute == restart_minute:
+                    print(f"Scheduled restart time reached ({restart_time}). Restarting TTD...")
+                    process.terminate()  # Terminate the current process
+                    process.wait()  # Wait for the process to exit
+                    break  # Exit inner loop to relaunch TTD
+
+            # Check if TTD has crashed
+            if process.poll() is not None:
+                print("TTD has crashed. Relaunching...")
+                break  # Exit inner loop to relaunch TTD
+
+            # Sleep for a short interval before checking again
+            time.sleep(60)  # Check once every minute
+
+        # Wait for a few seconds before relaunching after crash or scheduled restart
         time.sleep(2)
+
 
 if __name__ == "__main__":
 
