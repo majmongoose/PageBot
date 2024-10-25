@@ -93,6 +93,8 @@ async def upload_to_discord(mp4_file,text):
     else:
         print(f"Could not find channel with ID {channel}")
 
+from datetime import datetime
+
 
 def launch_and_watch(program_path):
     program_directory = os.path.dirname(program_path)
@@ -102,15 +104,8 @@ def launch_and_watch(program_path):
         restart_hour, restart_minute = map(int, restart_time.split(":"))
     
     restart_triggered = False  # Flag to prevent multiple restarts within the same minute
-    process = None  # Initialize the process variable outside the loop
 
     while True:
-        # If a process is already running, terminate it before starting a new one
-        if process and process.poll() is None:
-            print("Terminating the existing TTD process before restarting...")
-            process.terminate()
-            process.wait()
-
         # Launch the TTD program
         print("Starting TTD program...")
         process = subprocess.Popen(program_path, cwd=program_directory)
@@ -142,7 +137,6 @@ def launch_and_watch(program_path):
         # Wait for a few seconds before relaunching after crash or scheduled restart
         print("Waiting before relaunching TTD...")
         time.sleep(2)
-
 
 if __name__ == "__main__":
 
