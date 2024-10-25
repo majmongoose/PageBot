@@ -14,5 +14,3 @@ delete_after_upload=True
 speech_to_text = True
 ## The background image for the video.
 image_path = "img/blacksmall.jpg"
-## time to restart daily, "None" to disable
-restart_time = "02:00"
