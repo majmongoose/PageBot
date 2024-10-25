@@ -99,7 +99,7 @@ def kill_existing_ttd_instances():
     """Terminate all running instances of TTD."""
     for proc in psutil.process_iter(['name', 'exe', 'cmdline']):
         try:
-            if 'twotone' in proc.name().lower() or 'twotone' in ' '.join(proc.cmdline()).lower():
+            if 'ttd' in proc.name().lower() or 'ttd' in ' '.join(proc.cmdline()).lower():
                 print("Terminating an existing instance of TTD...")
                 proc.terminate()  # Send SIGTERM
                 proc.wait()  # Wait for the process to terminate
