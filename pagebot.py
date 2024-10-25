@@ -95,27 +95,36 @@ async def upload_to_discord(mp4_file,text):
 
 from datetime import datetime
 
+
 def launch_and_watch(program_path):
     program_directory = os.path.dirname(program_path)
     restart_time = secrets_file.restart_time  # Format: "HH:MM" or None
 
-    # Parse the restart time only if it's specified
     if restart_time:
         restart_hour, restart_minute = map(int, restart_time.split(":"))
+    
+    restart_triggered = False  # Flag to prevent multiple restarts within the same minute
 
     while True:
         # Launch the TTD program
+        print("Starting TTD program...")
         process = subprocess.Popen(program_path, cwd=program_directory)
 
         while True:
-            # Check every minute if it's time to restart TTD (only if restart_time is set)
             if restart_time:
                 current_time = datetime.now()
-                if current_time.hour == restart_hour and current_time.minute == restart_minute:
+                
+                # Check if it's the restart time and restart hasn't been triggered in the current minute
+                if (current_time.hour == restart_hour and current_time.minute == restart_minute and not restart_triggered):
                     print(f"Scheduled restart time reached ({restart_time}). Restarting TTD...")
-                    process.terminate()  # Terminate the current process
-                    process.wait()  # Wait for the process to exit
+                    process.terminate()
+                    process.wait()
+                    restart_triggered = True  # Set flag to prevent multiple restarts in the same minute
                     break  # Exit inner loop to relaunch TTD
+                
+                # Reset the flag once we're past the restart minute
+                if current_time.minute != restart_minute:
+                    restart_triggered = False
 
             # Check if TTD has crashed
             if process.poll() is not None:
@@ -126,8 +135,8 @@ def launch_and_watch(program_path):
             time.sleep(60)  # Check once every minute
 
         # Wait for a few seconds before relaunching after crash or scheduled restart
+        print("Waiting before relaunching TTD...")
         time.sleep(2)
-
 
 if __name__ == "__main__":
 
